@@ -10,4 +10,6 @@ export const errorCodesText = {
   403: "ACCESS_DENIED",
   404: "NOT_FOUND",
   400: "INTERNAL_ERROR",
+  409: "USER_ALREADY_EXIST",
+  500: "INTERNAL_SERVER_ERROR",
 };
