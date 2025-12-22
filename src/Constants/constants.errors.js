@@ -5,8 +5,8 @@
 // • Return 500 for unexpected errors
 
 export const errorCodesText = {
-  400: "INVALID_PAYLOAD",
-  401: "TOKEN_EXPIRED",
+  400: "INVALID_PAYLOAD/TOKEN",
+  401: "UNAUTHORIZED",
   403: "ACCESS_DENIED",
   404: "NOT_FOUND",
   400: "INTERNAL_ERROR",
