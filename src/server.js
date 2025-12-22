@@ -5,8 +5,9 @@ import connectMongoDb from "./utils/db.js";
 import User from "./models/user.model.js";
 import { createError } from "./utils/apiError.js";
 import authrouter from "./routes/auth.routes.js";
+import taskRouter from "./routes/task.routes.js";
 import cookieParser from "cookie-parser";
-
+import protect from "./middlewares/auth.middleware.js";
 dotenv.config();
 const PORT = process.env.PORT || 7000;
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authrouter);
+app.use("/task", protect, taskRouter);
 
 connectMongoDb(process.env.MONGO_URI);
 

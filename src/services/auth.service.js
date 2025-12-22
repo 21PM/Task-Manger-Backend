@@ -83,38 +83,23 @@ export const signupService = async ({ email, password, name }) => {
 
 export const refreshService = async (refreshToken) => {
   if (!refreshToken) {
-    const statusCode = 401;
-    throw createError(
-      statusCode,
-      errorCodesText[statusCode],
-      "Refresh token missing"
-    );
+    throw createError(401, "AUTH_ERROR", "Refresh token missing");
   }
 
   let decoded;
   try {
     decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-  } catch {
-    const statusCode = 401;
-    throw createError(
-      statusCode,
-      errorCodesText[statusCode],
-      "Invalid refresh token"
-    );
+  } catch (error) {
+    throw createError(401, "AUTH_ERROR", "Invalid refresh token");
   }
 
-  const user = await User.findById(decoded.userId);
+  const user = await User.findById(decoded.id);
   if (!user || user.refreshToken !== refreshToken) {
-    const statusCode = 401;
-    throw createError(
-      statusCode,
-      errorCodesText[statusCode],
-      "Invalid refresh token"
-    );
+    throw createError(401, "AUTH_ERROR", "Invalid refresh token");
   }
 
   const newAccessToken = generateAccessToken({
-    userId: user._id,
+    id: user._id,
     email: user.email,
   });
 
@@ -141,6 +126,8 @@ export const logoutService = async (refreshToken) => {
       "Invalid refresh token"
     );
   }
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
 
   user.refreshToken = null;
   await user.save();

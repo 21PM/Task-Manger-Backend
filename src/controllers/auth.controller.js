@@ -7,14 +7,26 @@ import {
 
 export const login = async (req, res, next) => {
   try {
-    const result = await loginService(req.body);
-    res.cookie("refreshToken", result.refreshToken, {
+    const { accessToken, refreshToken } = await loginService(req.body);
+
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: true,
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 15 * 60 * 1000, // 15 minutes
     });
-    res.status(200).json(result);
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+    });
   } catch (error) {
     next(error);
   }
