@@ -23,9 +23,12 @@ const protect = async (req, res, next) => {
 
     // Get user from DB
     const user = await User.findById(decoded.userId).select("-password");
+
     if (!user) {
       return next(createError(401, "AUTH_ERROR", "User not found"));
     }
+    // console.log("USER",user);
+    console.log("middleware passed");
 
     // Attach user to request
     req.user = user;
