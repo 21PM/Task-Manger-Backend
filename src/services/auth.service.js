@@ -37,8 +37,15 @@ export const loginService = async ({ email, password }) => {
   // store refresh token in DB
   user.refreshToken = refreshToken;
   await user.save();
+  console.log("user", user);
 
   return {
+    userDetails: {
+      name: user.name,
+      email: user.email,
+      id: user._id,
+      role: user.role,
+    },
     accessToken,
     refreshToken,
   };
@@ -126,11 +133,21 @@ export const logoutService = async (refreshToken) => {
       "Invalid refresh token"
     );
   }
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
-
   user.refreshToken = null;
   await user.save();
 
   return { message: "Logged out successfully" };
+};
+
+export const checkAuthController = async (req) => {
+  // console.log("check auth req received");
+
+  const user = await User.findById(req.user._id).select("_id name email role");
+
+  if (!user) {
+    const statusCode = 401;
+    throw createError(statusCode, errorCodesText[statusCode], "User not found");
+  }
+
+  return { user };
 };

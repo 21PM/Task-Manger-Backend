@@ -13,7 +13,15 @@ const PORT = process.env.PORT || 7000;
 
 const app = express();
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: true, // Reflects the request origin, allowing all but avoiding the '*' wildcard issue
+    credentials: true, // Required if you want to send/receive cookies
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/auth", authrouter);

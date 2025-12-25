@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import { createError } from "../utils/apiError.js";
 const protect = async (req, res, next) => {
+  // console.log("req recived on middleware");
+
   try {
     //  Get access token from cookies
     const accessToken = req.cookies?.accessToken;

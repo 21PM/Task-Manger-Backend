@@ -1,4 +1,5 @@
 import {
+  checkAuthController,
   loginService,
   logoutService,
   refreshService,
@@ -7,7 +8,9 @@ import {
 
 export const login = async (req, res, next) => {
   try {
-    const { accessToken, refreshToken } = await loginService(req.body);
+    const { accessToken, refreshToken, userDetails } = await loginService(
+      req.body
+    );
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
@@ -26,6 +29,7 @@ export const login = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Login successful",
+      userDetails,
     });
   } catch (error) {
     next(error);
@@ -58,13 +62,33 @@ export const logout = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     const result = await logoutService(refreshToken);
-
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      sameSite: "strict",
+    });
     res.clearCookie("refreshToken", {
       httpOnly: true,
       sameSite: "strict",
     });
 
     res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const checkAuth = async (req, res, next) => {
+  console.log("auth req received");
+
+  try {
+    const result = await checkAuthController(req);
+    console.log(result);
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      userDetails: result.user,
+    });
   } catch (error) {
     next(error);
   }

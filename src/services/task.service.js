@@ -5,9 +5,7 @@ import { createError } from "../utils/apiError.js";
 export const createTaskService = async (req) => {
   try {
     console.log("req.body", req.body);
-    const { title, description, status, priority } = req.body;
-
-    console.log({ title, description, status, priority });
+    const { title, description, status, priority, dueDate } = req.body;
 
     //  Validation
     if (!title || title.trim() === "") {
@@ -18,6 +16,8 @@ export const createTaskService = async (req) => {
         "Title is required"
       );
     }
+    console.log("before task creation", req.user._id);
+    console.log(dueDate);
 
     //  Create task
     const task = await Task.create({
@@ -25,8 +25,10 @@ export const createTaskService = async (req) => {
       description,
       status,
       priority,
+      dueDate,
       user: req.user._id,
     });
+    console.log("after task creation");
 
     // Success response
     return {
@@ -35,6 +37,8 @@ export const createTaskService = async (req) => {
       data: task,
     };
   } catch (error) {
+    console.log("error 40", error);
+
     //  Mongoose validation errors
     if (error.name === "ValidationError") {
       const statusCode = 400;
