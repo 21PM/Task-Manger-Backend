@@ -36,8 +36,7 @@ export const loginService = async ({ email, password }) => {
 
   // store refresh token in DB
   user.refreshToken = refreshToken;
-  await user.save();
-  console.log("user", user);
+  await user.save({ validateBeforeSave: false });
 
   return {
     userDetails: {
@@ -134,7 +133,7 @@ export const logoutService = async (refreshToken) => {
     );
   }
   user.refreshToken = null;
-  await user.save();
+  await user.save({ validateBeforeSave: false });
 
   return { message: "Logged out successfully" };
 };

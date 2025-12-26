@@ -39,7 +39,7 @@ export const login = async (req, res, next) => {
 export const signup = async (req, res, next) => {
   try {
     const result = await signupService(req.body);
-    console.log("resilt", result);
+    // console.log("resilt", result);
 
     res.status(200).json(result);
   } catch (error) {
@@ -78,11 +78,11 @@ export const logout = async (req, res, next) => {
 };
 
 export const checkAuth = async (req, res, next) => {
-  console.log("auth req received");
+  // console.log("auth req received");
 
   try {
     const result = await checkAuthController(req);
-    console.log(result);
+    // console.log(result);
 
     res.status(200).json({
       success: true,

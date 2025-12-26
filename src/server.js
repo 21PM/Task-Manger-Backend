@@ -30,8 +30,6 @@ app.use("/task", protect, taskRouter);
 connectMongoDb(process.env.MONGO_URI);
 
 app.use((err, req, res, next) => {
-  console.log();
-
   res.status(err.statusCode || 500).json({
     success: false,
     errorCode: err.code || "SERVER_ERROR",

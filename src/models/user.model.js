@@ -1,11 +1,20 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
+const passwordRegex =
+  /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: true,
+      match: [
+        passwordRegex,
+        "Password must be at least 8 characters long, include 1 uppercase letter, 1 number, and 1 special character.",
+      ],
+    },
     role: { type: String, enum: ["USER", "ADMIN"], default: "USER" },
     refreshToken: { type: String, default: null },
   },

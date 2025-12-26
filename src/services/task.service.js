@@ -4,8 +4,9 @@ import { createError } from "../utils/apiError.js";
 
 export const createTaskService = async (req) => {
   try {
-    console.log("req.body", req.body);
-    const { title, description, status, priority, dueDate } = req.body;
+    // console.log("req.body", req.body);
+    const { title, description, status, priority, dueDate, assignee } =
+      req.body;
 
     //  Validation
     if (!title || title.trim() === "") {
@@ -16,8 +17,6 @@ export const createTaskService = async (req) => {
         "Title is required"
       );
     }
-    console.log("before task creation", req.user._id);
-    console.log(dueDate);
 
     //  Create task
     const task = await Task.create({
@@ -26,9 +25,9 @@ export const createTaskService = async (req) => {
       status,
       priority,
       dueDate,
+      assignee,
       user: req.user._id,
     });
-    console.log("after task creation");
 
     // Success response
     return {
@@ -37,8 +36,6 @@ export const createTaskService = async (req) => {
       data: task,
     };
   } catch (error) {
-    console.log("error 40", error);
-
     //  Mongoose validation errors
     if (error.name === "ValidationError") {
       const statusCode = 400;
@@ -59,7 +56,8 @@ export const createTaskService = async (req) => {
 export const editTaskService = async (req) => {
   try {
     const { taskId } = req.params;
-    const { title, description, status, priority } = req.body;
+    const { title, description, status, priority, assignee, dueDate } =
+      req.body;
 
     // Validation: Check if taskId is provided
     if (!taskId) {
@@ -98,6 +96,8 @@ export const editTaskService = async (req) => {
     if (description !== undefined) task.description = description;
     if (status !== undefined) task.status = status;
     if (priority !== undefined) task.priority = priority;
+    if (dueDate !== undefined) task.dueDate = dueDate;
+    if (assignee !== undefined) task.assignee = assignee;
 
     // Save updated task
     const updatedTask = await task.save();
@@ -141,7 +141,7 @@ export const deleteTaskService = async (req) => {
     let task;
 
     // 🔐 Admin can delete any task
-    if (req.user.role === "admin") {
+    if (req.user.role === "ADMIN") {
       task = await Task.findById(taskId);
     } else {
       // 👤 User can delete only their own task
@@ -197,7 +197,7 @@ export const getTasksService = async (req) => {
     const { status, priority, search, sort } = req.query;
 
     // Base filter
-    const filter = req.user.role === "admin" ? {} : { user: req.user._id };
+    const filter = req.user.role === "ADMIN" ? {} : { user: req.user._id };
 
     // Filters
     if (status) filter.status = status;
@@ -214,15 +214,20 @@ export const getTasksService = async (req) => {
     // Sort
     let sortBy = { createdAt: -1 };
     if (sort) {
-      const [field, order] = sort.split(":");
-      sortBy = { [field]: order === "asc" ? 1 : -1 };
+      sortBy = {
+        createdAt: sort === "asc" ? 1 : -1,
+      };
     }
 
-    const tasks = await Task.find(filter)
-      .sort(sortBy)
-      .skip(skip)
-      .limit(limit)
-      .populate("user", "name email");
+    // ✅ Build query
+    let query = Task.find(filter).sort(sortBy).skip(skip).limit(limit);
+
+    // ✅ Populate ONLY for admin
+    if (req.user.role === "ADMIN") {
+      query = query.populate("user", "name email");
+    }
+
+    const tasks = await query;
 
     const total = await Task.countDocuments(filter);
 
@@ -236,6 +241,74 @@ export const getTasksService = async (req) => {
       },
     };
   } catch (error) {
-    next(error);
+    throw error;
+  }
+};
+export const getTaskByIdService = async (req) => {
+  try {
+    const { id } = req.params;
+
+    // Validate id
+    if (!id) {
+      const statusCode = 400;
+      throw createError(
+        statusCode,
+        errorCodesText[statusCode],
+        "Task id is required"
+      );
+    }
+
+    // Find task
+    const task = await Task.findById(id);
+
+    if (!task) {
+      const statusCode = 404;
+      throw createError(
+        statusCode,
+        errorCodesText[statusCode],
+        "Task not found"
+      );
+    }
+
+    // Authorization check (important)
+    if (task.user.toString() !== req.user._id.toString()) {
+      const statusCode = 403;
+      throw createError(
+        statusCode,
+        errorCodesText[statusCode],
+        "You are not allowed to view this task"
+      );
+    }
+
+    return {
+      success: true,
+      message: "Task fetched successfully",
+      data: task,
+    };
+  } catch (error) {
+    // Invalid Mongo ObjectId
+    if (error.name === "CastError") {
+      const statusCode = 400;
+      throw createError(
+        statusCode,
+        errorCodesText[statusCode],
+        "Invalid task id"
+      );
+    }
+
+    // Known errors
+    if (error.statusCode) {
+      throw error;
+    }
+
+    // Fallback
+    const statusCode = 500;
+    console.log(error);
+
+    throw createError(
+      statusCode,
+      errorCodesText[statusCode],
+      "Something went wrong while fetching the task"
+    );
   }
 };

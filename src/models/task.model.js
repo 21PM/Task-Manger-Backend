@@ -14,24 +14,25 @@ const taskSchema = new mongoose.Schema(
       enum: ["LOW", "MEDIUM", "HIGH"],
       default: "LOW",
     },
+    assignee: { type: String },
     dueDate: {
       type: Date,
       required: false, // optional
-      validate: {
-        validator: function (value) {
-          if (!value) return true;
-          // console.log(value);
-          // 2025 - 12 - 26;
-          // 2025-12-26T00:00:00.000Z
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const dueDate = new Date(value);
-          dueDate.setHours(0, 0, 0, 0);
-          console.log(" dueDate >= today", dueDate >= today);
-          return dueDate >= today;
-        },
-        message: "Due date cannot be in the past",
-      },
+      // validate: {
+      //   validator: function (value) {
+      //     if (!value) return true;
+      //     // console.log(value);
+      //     // 2025 - 12 - 26;
+      //     // 2025-12-26T00:00:00.000Z
+      //     const today = new Date();
+      //     today.setHours(0, 0, 0, 0);
+      //     const dueDate = new Date(value);
+      //     dueDate.setHours(0, 0, 0, 0);
+      //     console.log(" dueDate >= today", dueDate >= today);
+      //     return dueDate >= today;
+      //   },
+      //   message: "Due date cannot be in the past",
+      // },
     },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   },
