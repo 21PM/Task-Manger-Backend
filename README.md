@@ -14,7 +14,7 @@ A full-stack task management application built with React (frontend) and Node.js
 ### Frontend
 - **Framework:** React with Vite
 - **State Management:** React Context + TanStack Query (React Query v5)
-- **Styling:** [Add your styling solution - Tailwind/CSS/etc.]
+- **Styling:** [Tailwind/CSS/etc.]
 
 ### Backend
 - **Framework:** Node.js + Express
@@ -62,8 +62,6 @@ NODE_ENV=development
 # Development mode with auto-reload
 node --watch src/server.js
 
-# Or with nodemon
-npm run dev
 ```
 
 The server will start on `http://localhost:5000` (or your specified PORT).
@@ -107,26 +105,30 @@ http://localhost:5000/api
 
 ### Authentication Endpoints
 
-#### **Register**
+#### **Sign up**
 ```
-POST /auth/register
+POST /auth/signup
 ```
 
 **Request Body:**
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123"
+  "email": "user@example.com",
+  "password": "password123",
+   "name":john
 }
+
 ```
 
 **Response:**
 ```json
 {
-  "success": true,
-  "message": "User registered successfully"
+    "message": "Signup successful",
+    "userId": "694e33deee9c1f095704e8af",
+    "name": "jp",
+    "email": "jp@gmail.com"
 }
+
 ```
 
 ---
@@ -170,7 +172,6 @@ POST /auth/logout
 **Response:**
 ```json
 {
-  "success": true,
   "message": "Logged out successfully"
 }
 ```
@@ -231,7 +232,7 @@ DELETE /tasks/:id
 ## 6. Authentication Strategy
 
 ### Token Management
-- **Access Token:** Short-lived (15-30 minutes), stored in httpOnly cookie
+- **Access Token:** Short-lived (15 minutes), stored in httpOnly cookie
 - **Refresh Token:** Long-lived (7 days), stored in httpOnly cookie
 - **Storage:** Cookies are httpOnly, secure, and SameSite protected
 
@@ -292,49 +293,7 @@ const { data: tasks, isLoading, error } = useQuery({
 - **Security vs Convenience:** httpOnly cookies require backend calls to verify auth status but significantly improve security
 - **Session Management:** Using cookies instead of localStorage prevents XSS but requires CORS configuration
 
-### CORS Configuration
-Backend must allow credentials:
-```javascript
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
-}));
-```
 
----
-
-## 10. Testing
-
-### Backend Testing
-```bash
-npm test
-```
-
-### Frontend Testing
-```bash
-npm test
-```
-
----
-
-## 11. Deployment
-
-### Environment Variables
-Ensure all production environment variables are set:
-- Update `MONGO_URI` to production database
-- Generate strong secrets for tokens
-- Set `NODE_ENV=production`
-- Update `VITE_API_BASE_URL` to production API URL
-
-### Security Checklist
-- [ ] Use HTTPS in production
-- [ ] Set secure cookie flags
-- [ ] Configure CORS properly
-- [ ] Use environment variables for secrets
-- [ ] Implement rate limiting
-- [ ] Add input validation
-
----
 
 ## 12. Troubleshooting
 
@@ -354,22 +313,3 @@ Ensure all production environment variables are set:
 
 ---
 
-## 13. Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
----
-
-## 14. License
-
-[Specify your license here - MIT, Apache, etc.]
-
----
-
-## 15. Contact
-
-For questions or support, please open an issue in the respective GitHub repository.
