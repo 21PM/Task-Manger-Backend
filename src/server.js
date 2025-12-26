@@ -9,16 +9,16 @@ import taskRouter from "./routes/task.routes.js";
 import cookieParser from "cookie-parser";
 import protect from "./middlewares/auth.middleware.js";
 dotenv.config();
-const PORT = process.env.PORT || 7000;
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 app.use(cookieParser());
 app.use(
   cors({
-    origin: true, // Reflects the request origin, allowing all but avoiding the '*' wildcard issue
-    credentials: true, // Required if you want to send/receive cookies
+    origin: true, // can add specific origin here but right now did't to test with any frontend
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization"], // Add other headers in case needed in future currently ther is no need as we are saveing tokesn in cookiess
   })
 );
 
